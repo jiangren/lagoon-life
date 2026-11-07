@@ -4,10 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover">
 		<title>Lagoon Life · 海湾生活</title>
-        <link rel="manifest" href="lagoon-0.45.0-be7658511741.webmanifest">
+        <link rel="manifest" href="lagoon-0.45.1-86f854fe100d.webmanifest">
         <meta name="theme-color" content="#193e33">
-        <link rel="apple-touch-icon" href="lagoon-0.45.0-be7658511741.pwa-192.png">
-        <meta name="game-version" content="0.45.0">
+        <link rel="apple-touch-icon" href="lagoon-0.45.1-86f854fe100d.pwa-192.png">
+        <meta name="game-version" content="0.45.1">
 		<style>
 :root { color-scheme: dark; font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
 html, body, #canvas { margin:0; padding:0; border:0; }
@@ -69,10 +69,24 @@ body.touch-game #browser-tools { display:none; }
 #status-notice { display:none; background:#f5eddf; color:#543e31; border-radius:12px; padding:20px; font-size:14px; line-height:1.7; overflow-wrap:anywhere; text-align:left; }
 #status-retry { margin-top:20px; padding:12px 24px; color:#193e33; background:#dfc58b; border:0; border-radius:10px; font:inherit; cursor:pointer; }
 #status-retry:focus-visible { outline:2px solid #fff8e4; outline-offset:4px; }
+dialog.lagoon-cloud { max-height:calc(100dvh - 32px); overflow:auto; }
+.lagoon-cloud h2 { margin:0 0 16px; font-size:24px; }
+.lagoon-cloud p { line-height:1.55; white-space:pre-line; overflow-wrap:anywhere; }
+.lagoon-cloud form, .lagoon-cloud label { display:grid; gap:8px; }
+.lagoon-cloud form { gap:14px; }
+.lagoon-cloud input, .lagoon-cloud button { min-height:44px; padding:8px 12px; border-radius:9px; font:inherit; }
+.lagoon-cloud input { width:100%; box-sizing:border-box; border:1px solid #8a9f8b; color:#183e33; background:#fffef7; }
+.lagoon-cloud button { border:1px solid #86a08a; color:#183e33; background:#e6eddf; cursor:pointer; }
+.lagoon-cloud button:focus-visible, .lagoon-cloud input:focus-visible { outline:2px solid #285b47; outline-offset:2px; }
+.lagoon-cloud button:disabled { opacity:.55; }
+.lagoon-cloud form button { color:#fff9e8; background:#285b47; }
+.cloud-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.cloud-note:empty { display:none; }
+.lagoon-cloud > button { margin-top:16px; }
 @media (prefers-reduced-motion:reduce) { #status-progress { animation:none; } }
 </style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="lagoon-0.45.0-be7658511741.icon.png" />
-<link rel="apple-touch-icon" href="lagoon-0.45.0-be7658511741.apple-touch-icon.png"/>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="lagoon-0.45.1-86f854fe100d.icon.png" />
+<link rel="apple-touch-icon" href="lagoon-0.45.1-86f854fe100d.apple-touch-icon.png"/>
 
 <script>
 window.LagoonFiles = {
@@ -192,7 +206,8 @@ window.LagoonFiles = {
           </div>
           <output id="touch-hint"></output>
         </section>
-        <script src="lagoon-0.45.0-be7658511741.touch.js"></script>
+        <script src="lagoon-0.45.1-86f854fe100d.touch.js"></script>
+        <script src="lagoon-0.45.1-86f854fe100d.cloud-saves.js"></script>
         <output id="performance-readout" aria-label="游戏性能读数" hidden>继续游戏后开始采样。</output>
         <script>
         (()=>{
@@ -258,12 +273,12 @@ window.LagoonFiles = {
             </div>
         </section>
 
-		<script src="lagoon-0.45.0-be7658511741.offline.js"></script>
-		<script src="lagoon-0.45.0-be7658511741.js"></script>
+		<script src="lagoon-0.45.1-86f854fe100d.offline.js"></script>
+		<script src="lagoon-0.45.1-86f854fe100d.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"lagoon-0.45.0-be7658511741","experimentalVK":false,"fileSizes":{"lagoon-0.45.0-be7658511741.pck":8396552,"lagoon-0.45.0-be7658511741.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"lagoon-0.45.1-86f854fe100d","experimentalVK":false,"fileSizes":{"lagoon-0.45.1-86f854fe100d.pck":8397128,"lagoon-0.45.1-86f854fe100d.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
-const BUILD_VERSION = '0.45.0';
+const BUILD_VERSION = '0.45.1';
 const engine = new Engine(GODOT_CONFIG);
 // Normal engine exit completes its filesystem flush before asking for new HTML.
 GODOT_CONFIG.onExit = code => {
