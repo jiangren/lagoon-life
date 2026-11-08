@@ -1,0 +1,127 @@
+lagoon-0.46.0-b9e086ca2879.audio.position.worklet.js
+  723e6178afcfe981 1-66
+lagoon-0.46.0-b9e086ca2879.html
+  723e6178afcfe981 1-423
+lagoon-0.46.0-b9e086ca2879.offline.js
+  723e6178afcfe981 1-92
+service-worker.js
+  723e6178afcfe981 1,4
+version.json
+  723e6178afcfe981 1
+lagoon-0.46.0-b9e086ca2879.cloud-saves.js
+  723e6178afcfe981 1-233
+index.html
+  723e6178afcfe981 7,9-10,24-29,35-36,47,78-79,96-97,191-195,211-213,224-225,291-292,294,296
+lagoon-0.46.0-b9e086ca2879.touch.js
+  723e6178afcfe981 1-130
+lagoon-0.46.0-b9e086ca2879.webmanifest
+  723e6178afcfe981 1
+lagoon-0.46.0-b9e086ca2879.js
+  723e6178afcfe981 1-909
+lagoon-0.46.0-b9e086ca2879.audio.worklet.js
+  723e6178afcfe981 1-213
+README.md
+  723e6178afcfe981 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8-ntes.9",
+  "base_commit_sha": "c6b41522688a261177a8c75452cad4d75d2dfdae",
+  "prompts": {
+    "723e6178afcfe981": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "rollout-2026-11-03T21-38-28-01a1a1a1-f7e5-7b22-912d-c535ae7df68b",
+        "model": "unknown"
+      },
+      "human_author": "hzjiangren",
+      "messages": [],
+      "total_additions": 206291,
+      "total_deletions": 19,
+      "accepted_lines": 206291,
+      "overriden_lines": 0,
+      "per_file_stats": {
+        "lagoon-0.46.0-b9e086ca2879.audio.worklet.js": {
+          "additions": 213,
+          "accepted_lines": 213
+        },
+        "lagoon-0.46.0-b9e086ca2879.html": {
+          "additions": 423,
+          "accepted_lines": 423
+        },
+        "lagoon-0.46.0-b9e086ca2879.pwa-512.png": {
+          "additions": 82,
+          "accepted_lines": 82
+        },
+        "lagoon-0.46.0-b9e086ca2879.pck": {
+          "additions": 32807,
+          "accepted_lines": 32807
+        },
+        "lagoon-0.46.0-b9e086ca2879.js": {
+          "additions": 909,
+          "accepted_lines": 909
+        },
+        "lagoon-0.46.0-b9e086ca2879.pwa-192.png": {
+          "additions": 22,
+          "accepted_lines": 22
+        },
+        "lagoon-0.46.0-b9e086ca2879.apple-touch-icon.png": {
+          "additions": 53,
+          "accepted_lines": 53
+        },
+        "service-worker.js": {
+          "additions": 2,
+          "deletions": 2,
+          "accepted_lines": 2
+        },
+        "lagoon-0.46.0-b9e086ca2879.touch.js": {
+          "additions": 130,
+          "accepted_lines": 130
+        },
+        "lagoon-0.46.0-b9e086ca2879.audio.position.worklet.js": {
+          "additions": 66,
+          "accepted_lines": 66
+        },
+        "lagoon-0.46.0-b9e086ca2879.cloud-saves.js": {
+          "additions": 233,
+          "accepted_lines": 233
+        },
+        "version.json": {
+          "additions": 1,
+          "deletions": 1,
+          "accepted_lines": 1
+        },
+        "lagoon-0.46.0-b9e086ca2879.webmanifest": {
+          "additions": 1,
+          "accepted_lines": 1
+        },
+        "lagoon-0.46.0-b9e086ca2879.wasm": {
+          "additions": 171126,
+          "accepted_lines": 171126
+        },
+        "index.html": {
+          "additions": 30,
+          "deletions": 15,
+          "accepted_lines": 30
+        },
+        "lagoon-0.46.0-b9e086ca2879.offline.js": {
+          "additions": 92,
+          "accepted_lines": 92
+        },
+        "README.md": {
+          "additions": 1,
+          "deletions": 1,
+          "accepted_lines": 1
+        },
+        "lagoon-0.46.0-b9e086ca2879.icon.png": {
+          "additions": 30,
+          "accepted_lines": 30
+        },
+        "lagoon-0.46.0-b9e086ca2879.png": {
+          "additions": 70,
+          "accepted_lines": 70
+        }
+      }
+    }
+  }
+}
