@@ -1,7 +1,7 @@
-const build = 'lagoon-0.46.0-b9e086ca2879';
+const build = 'lagoon-0.46.1-e5d1f0ad55d5';
 const prefix = 'lagoon-offline:' + self.registration.scope + ':';
 const cacheName = prefix + build;
-const files = ["lagoon-0.46.0-b9e086ca2879.apple-touch-icon.png", "lagoon-0.46.0-b9e086ca2879.audio.position.worklet.js", "lagoon-0.46.0-b9e086ca2879.audio.worklet.js", "lagoon-0.46.0-b9e086ca2879.cloud-saves.js", "lagoon-0.46.0-b9e086ca2879.html", "lagoon-0.46.0-b9e086ca2879.icon.png", "lagoon-0.46.0-b9e086ca2879.js", "lagoon-0.46.0-b9e086ca2879.offline.js", "lagoon-0.46.0-b9e086ca2879.pck", "lagoon-0.46.0-b9e086ca2879.png", "lagoon-0.46.0-b9e086ca2879.pwa-192.png", "lagoon-0.46.0-b9e086ca2879.pwa-512.png", "lagoon-0.46.0-b9e086ca2879.touch.js", "lagoon-0.46.0-b9e086ca2879.wasm", "lagoon-0.46.0-b9e086ca2879.webmanifest"];
+const files = ["lagoon-0.46.1-e5d1f0ad55d5.apple-touch-icon.png", "lagoon-0.46.1-e5d1f0ad55d5.audio.position.worklet.js", "lagoon-0.46.1-e5d1f0ad55d5.audio.worklet.js", "lagoon-0.46.1-e5d1f0ad55d5.cloud-saves.js", "lagoon-0.46.1-e5d1f0ad55d5.html", "lagoon-0.46.1-e5d1f0ad55d5.icon.png", "lagoon-0.46.1-e5d1f0ad55d5.js", "lagoon-0.46.1-e5d1f0ad55d5.offline.js", "lagoon-0.46.1-e5d1f0ad55d5.pck", "lagoon-0.46.1-e5d1f0ad55d5.png", "lagoon-0.46.1-e5d1f0ad55d5.pwa-192.png", "lagoon-0.46.1-e5d1f0ad55d5.pwa-512.png", "lagoon-0.46.1-e5d1f0ad55d5.touch.js", "lagoon-0.46.1-e5d1f0ad55d5.wasm", "lagoon-0.46.1-e5d1f0ad55d5.webmanifest"];
 const entry = new URL(build + '.html', self.registration.scope).href;
 const scope = new URL(self.registration.scope);
 
