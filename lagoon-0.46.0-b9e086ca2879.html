@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover">
+		<title>Lagoon Life · 海湾生活</title>
+        <link rel="manifest" href="lagoon-0.46.0-b9e086ca2879.webmanifest">
+        <meta name="theme-color" content="#193e33">
+        <link rel="apple-touch-icon" href="lagoon-0.46.0-b9e086ca2879.pwa-192.png">
+        <meta name="game-version" content="0.46.0">
+		<style>
+:root { color-scheme: dark; font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+html, body, #canvas { margin:0; padding:0; border:0; }
+body { color:#f8f4e6; background:#193e33; overflow:hidden; }
+#canvas { display:block; touch-action:none; }
+#canvas:focus { outline:none; }
+
+#touch-controls { position:fixed; inset:0; z-index:3; pointer-events:none; --left:max(12px,env(safe-area-inset-left)); --right:max(12px,env(safe-area-inset-right)); --top:max(8px,env(safe-area-inset-top)); --bottom:max(12px,env(safe-area-inset-bottom)); font:14px system-ui,sans-serif; }
+#touch-controls button { min-width:44px; min-height:44px; padding:0 10px; color:#fff9e8; background:#234c3eea; border:1px solid #adcbab; border-radius:12px; font:inherit; font-weight:600; touch-action:none; pointer-events:auto; }
+#touch-controls button:active, #touch-controls button.held { background:#e6d6a2; color:#153b2c; }
+#touch-controls button:focus-visible { outline:2px solid #f3d583; }
+.touch-nav { position:absolute; top:var(--top); left:var(--left); right:var(--right); display:flex; justify-content:flex-end; flex-wrap:wrap; gap:6px; }
+#touch-time { margin-right:auto; align-self:center; background:#193e33ee; border-radius:8px; padding:8px; color:#fff9e8; }
+#touch-goal { position:absolute; top:calc(var(--top) + 54px); left:var(--left); display:grid; gap:3px; width:max-content; max-width:min(310px,calc(100% - 24px)); box-sizing:border-box; padding:9px 12px; border-radius:12px; background:#fff4d9f5; color:#214737; box-shadow:0 4px 16px #173a2d32; }
+#touch-goal[hidden] { display:none; }
+#touch-goal-heading { color:#725223; font-size:12px; }
+#touch-goal-title { font-size:17px; line-height:1.3; }
+#touch-goal-detail { font-size:13px; line-height:1.4; white-space:pre-line; }
+#touch-extra { z-index:1; position:absolute; top:calc(var(--top) + 52px); right:var(--right); display:grid; grid-template-columns:repeat(2, minmax(96px,1fr)); gap:6px; padding:8px; max-height:calc(100% - 120px); overflow:auto; background:#173a2df5; border-radius:14px; pointer-events:auto; touch-action:pan-y; }
+#touch-extra[hidden], #touch-controls[hidden] { display:none; }
+#touch-extra button { touch-action:pan-y; }
+#touch-pad { position:absolute; left:var(--left); bottom:var(--bottom); width:116px; height:116px; display:grid; place-items:center; border-radius:50%; border:1px solid #b4d2b5; background:#204c3fca; pointer-events:auto; touch-action:none; user-select:none; }
+#touch-stick { display:block; width:48px; height:48px; border-radius:50%; background:#f4e9c1; border:2px solid #92b096; box-shadow:0 2px 9px #193e3360; pointer-events:none; }
+.touch-actions { position:absolute; right:var(--right); bottom:var(--bottom); display:grid; grid-template-columns:repeat(2,auto); justify-items:stretch; gap:6px; }
+#touch-interact { grid-column:span 2; min-height:48px; max-width:224px; }
+#touch-interact.ready { background:#f5df9e; color:#1a3a2f; border-color:#fff1c5; }
+#touch-hint { position:absolute; bottom:calc(var(--bottom) + 125px); left:var(--left); max-width:min(550px,calc(100% - 24px)); padding:5px 10px; border-radius:8px; background:#193e33dc; color:#fff9e8; overflow-wrap:anywhere; }
+#touch-hint:empty { display:none; }
+body.touch-game #browser-tools { display:none; }
+@media (min-width:720px) and (min-height:550px) {
+  #touch-pad { width:142px; height:142px; }
+  #touch-hint { bottom:calc(var(--bottom) + 153px); }
+  #touch-controls button { min-height:48px; padding-inline:14px; }
+}
+@media (max-width:480px) {
+  #touch-time { position:absolute; top:50px; left:0; }
+  #touch-extra, #touch-goal { top:calc(var(--top) + 90px); }
+}
+
+#browser-tools { position:fixed; right:16px; bottom:12px; z-index:3; display:flex; align-items:center; gap:12px; }
+#fullscreen-toggle, #offline-status, #install-game { color:#fff9e8; background:#285b47; border:1px solid #83a78d; border-radius:10px; padding:8px 14px; font:14px system-ui,sans-serif; cursor:pointer; }
+#fullscreen-toggle:hover, #offline-status:hover, #install-game:hover { background:#367459; }
+#fullscreen-toggle:focus-visible, #offline-status:focus-visible, #install-game:focus-visible { outline:2px solid #dfc58b; outline-offset:3px; }
+#display-feedback { max-width:280px; color:#fff9e8; background:#193e33; border-radius:8px; padding:8px; font-size:13px; }
+#display-feedback:empty { display:none; }
+#update-available { color:#193e33; background:#dfc58b; border:0; border-radius:10px; padding:8px 14px; font:14px system-ui,sans-serif; cursor:pointer; }
+#update-available[hidden], #performance-readout[hidden] { display:none; }
+#update-available:focus-visible { outline:2px solid #fff9e8; outline-offset:3px; }
+#performance-readout { position:fixed; top:124px; left:32%; z-index:2; padding:8px 12px; border-radius:8px; background:#193e33e8; color:#fff9e8; font:12px/1.6 system-ui,sans-serif; white-space:pre-line; pointer-events:none; }
+#status {
+ position:fixed; inset:0; z-index:10; display:grid; place-items:center;
+ background:radial-gradient(ellipse at 50% 25%, #315f4d 0%, #193e33 65%);
+}
+.loading-content { width:min(380px, calc(100vw - 64px)); text-align:center; }
+.loading-brand { margin:0 0 20px; color:#dfc58b; font-size:13px; letter-spacing:.28em; }
+.loading-title { margin:0; font-size:clamp(36px, 6vw, 56px); font-weight:600; letter-spacing:.12em; line-height:1.5; }
+.loading-tagline { margin:16px 0 64px; color:#d3dfd2; font-size:16px; letter-spacing:.08em; }
+.loading-detail { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:14px; font-size:13px; color:#e3e9db; }
+#status-percent { color:#dfc58b; font-variant-numeric:tabular-nums; }
+#status-progress { display:block; width:100%; height:5px; border:0; border-radius:4px; overflow:hidden; background:#456958; accent-color:#dfc58b; }
+#status-progress::-webkit-progress-bar { background:#456958; border-radius:4px; }
+#status-progress::-webkit-progress-value { background:#dfc58b; border-radius:4px; }
+#status-progress::-moz-progress-bar { background:#dfc58b; border-radius:4px; }
+.loading-hint { margin-top:20px; color:#bdcebc; font-size:12px; line-height:1.8; }
+#status-notice { display:none; background:#f5eddf; color:#543e31; border-radius:12px; padding:20px; font-size:14px; line-height:1.7; overflow-wrap:anywhere; text-align:left; }
+#status-retry { margin-top:20px; padding:12px 24px; color:#193e33; background:#dfc58b; border:0; border-radius:10px; font:inherit; cursor:pointer; }
+#status-retry:focus-visible { outline:2px solid #fff8e4; outline-offset:4px; }
+#touch-extra, dialog.lagoon-cloud { scrollbar-width:none; }
+#touch-extra::-webkit-scrollbar, dialog.lagoon-cloud::-webkit-scrollbar { display:none; }
+dialog.lagoon-cloud { max-height:calc(100dvh - 32px); overflow:auto; }
+.lagoon-cloud h2 { margin:0 0 16px; font-size:24px; }
+.lagoon-cloud p { line-height:1.55; white-space:pre-line; overflow-wrap:anywhere; }
+.lagoon-cloud form, .lagoon-cloud label { display:grid; gap:8px; }
+.lagoon-cloud form { gap:14px; }
+.lagoon-cloud input, .lagoon-cloud button { min-height:44px; padding:8px 12px; border-radius:9px; font:inherit; }
+.lagoon-cloud input { width:100%; box-sizing:border-box; border:1px solid #8a9f8b; color:#183e33; background:#fffef7; }
+.lagoon-cloud button { border:1px solid #86a08a; color:#183e33; background:#e6eddf; cursor:pointer; }
+.lagoon-cloud button:focus-visible, .lagoon-cloud input:focus-visible { outline:2px solid #285b47; outline-offset:2px; }
+.lagoon-cloud button:disabled { opacity:.55; }
+.lagoon-cloud form button { color:#fff9e8; background:#285b47; }
+.cloud-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.cloud-note:empty { display:none; }
+.lagoon-cloud > button { margin-top:16px; }
+@media (prefers-reduced-motion:reduce) { #status-progress { animation:none; } }
+</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="lagoon-0.46.0-b9e086ca2879.icon.png" />
+<link rel="apple-touch-icon" href="lagoon-0.46.0-b9e086ca2879.apple-touch-icon.png"/>
+
+<script>
+window.LagoonFiles = {
+ active:false,
+ session:null,
+ pendingVersion:'',
+ updating:false,
+ bindSession(callback) { this.session=callback; },
+ gameActive(active) { this.active=active; if(!active){this.showPerformance(false);this.showTouch?.("","","");} if(active&&document.hidden) this.notify('hidden'); if(active&&this.pendingVersion)this.notify('update:'+this.pendingVersion); },
+ notify(...args) { if(this.active&&this.session) this.session(...args); },
+ async checkUpdate() {
+  if(this.checking)return;
+  this.checking=true;
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),5000);
+  try {
+   const response=await fetch('version.json',{cache:'no-store',signal:controller.signal});
+   if(!response.ok)throw new Error('version unavailable');
+   const data=await response.json();
+   if(!/^\d+\.\d+\.\d+$/.test(data.version))throw new Error('invalid version');
+   window.LagoonOffline?.checkUpdate();
+   const remote=data.version.split('.').map(Number),local=BUILD_VERSION.split('.').map(Number);
+   const differing=remote.findIndex((value,index)=>value!==local[index]);
+   if(differing>=0&&remote[differing]>local[differing]){
+    this.pendingVersion=data.version;
+    const button=document.getElementById('update-available');button.hidden=false;button.textContent='新版本 '+data.version;
+    this.notify('update:'+data.version);
+   }else{this.pendingVersion='';document.getElementById('update-available').hidden=true;this.notify('up_to_date');}
+  }catch(error){this.notify('update_failed');}
+  finally{clearTimeout(timeout);this.checking=false;}
+ },
+ prepareUpdate() { this.updating=true; document.getElementById('display-feedback').textContent='正在保存并准备更新，请稍候…'; },
+ showPerformance(show) { document.getElementById('performance-readout').hidden=!show; },
+ reportPerformance(text) {
+  const memory=performance.memory;
+  document.getElementById('performance-readout').textContent=text+'\n'+(memory?'浏览器JS堆 '+(memory.usedJSHeapSize/1048576).toFixed(1)+'MiB（非总内存）':'此浏览器未提供JS堆内存统计');
+ },
+ dialog(title) {
+  const dialog=document.createElement('dialog');
+  dialog.style.cssText='box-sizing:border-box;width:min(660px,90vw);border:0;border-radius:18px;padding:28px;color:#264f48;background:#f8f7ee;font:18px sans-serif;';
+  const heading=document.createElement('h2');heading.textContent=title;dialog.appendChild(heading);
+  document.body.appendChild(dialog);dialog.showModal();
+  const close=()=>{dialog.close();dialog.remove();document.getElementById('canvas').focus();};
+  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+  return {dialog,close};
+ },
+ editName(value,callback) {
+  const {dialog,close}=this.dialog('角色名字');
+  const input=document.createElement('input');input.value=value;input.maxLength=12;input.setAttribute('aria-label','角色名字');
+  input.style.cssText='box-sizing:border-box;width:100%;padding:12px;font-size:22px;';dialog.appendChild(input);
+  const submit=document.createElement('button');submit.textContent='确认名字';submit.style.cssText='margin:20px 12px 0 0;padding:12px 24px;font-size:18px;';
+  submit.onclick=()=>{const name=input.value.trim();if(name){close();callback(name);}};dialog.appendChild(submit);
+  const cancel=document.createElement('button');cancel.textContent='取消';cancel.onclick=close;dialog.appendChild(cancel);
+  input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();submit.click();}});input.focus();
+ },
+ pick(callback) {
+  const {dialog,close}=this.dialog('导入海湾生活存档');
+  const description=document.createElement('p');description.textContent='选择.json备份，或在下面粘贴存档文本。读取后仍需确认目标槽位。';dialog.appendChild(description);
+  const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.setAttribute('aria-label','选择存档文件');dialog.appendChild(input);
+  input.addEventListener('change',async()=>{try {
+   const file=input.files[0];if(!file)return;
+   if(file.size>32*1024*1024){close();callback('','备份超过32MB，请选择海湾生活存档。');return;}
+   const text=await file.text();close();callback(text);
+  }catch(error){close();callback('','文件读取失败，请重新选择。');}});
+  const text=document.createElement('textarea');text.setAttribute('aria-label','存档JSON文本');text.placeholder='也可以粘贴完整存档JSON';
+  text.style.cssText='box-sizing:border-box;display:block;width:100%;height:140px;margin-top:20px;font-size:16px;';dialog.appendChild(text);
+  const submit=document.createElement('button');submit.textContent='读取粘贴的存档';submit.style.cssText='margin:20px 12px 0 0;padding:12px;font-size:18px;';
+  submit.onclick=()=>{if(text.value.length>32*1024*1024){close();callback('','存档超过32MB。');return;}const value=text.value;close();callback(value);};dialog.appendChild(submit);
+  const cancel=document.createElement('button');cancel.textContent='取消';cancel.onclick=close;dialog.appendChild(cancel);
+ }
+};
+</script>
+	</head>
+	<body>
+		<canvas id="canvas" aria-label="海湾生活游戏画面">
+			当前浏览器不支持游戏画布。请使用支持 WebGL 2 的浏览器。
+		</canvas>
+
+        <div id="browser-tools" aria-label="游戏显示设置">
+            <span id="display-feedback" role="status"></span>
+            <button id="update-available" type="button" hidden>发现新版本</button>
+            <button id="offline-status" type="button">准备离线资源…</button>
+            <button id="install-game" type="button" hidden>安装游戏</button>
+            <button id="fullscreen-toggle" type="button" aria-pressed="false">全屏</button>
+        </div>
+        <section id="touch-controls" aria-label="游戏触控" hidden>
+          <nav class="touch-nav" aria-label="生活手账快捷入口">
+            <output id="touch-time"></output>
+            <button type="button" data-touch="map">地图</button>
+            <button type="button" data-touch="journal">任务</button>
+            <button type="button" data-touch="pause">暂停</button>
+            <button type="button" data-touch="more" aria-expanded="false" aria-controls="touch-extra">更多</button>
+          </nav>
+          <div id="touch-goal" aria-label="当前目标" hidden>
+            <span id="touch-goal-heading"></span>
+            <strong id="touch-goal-title"></strong>
+            <span id="touch-goal-detail"></span>
+          </div>
+          <div id="touch-extra" hidden>
+            <button type="button" data-touch="bag">背包</button>
+            <button type="button" data-touch="calendar">日历</button>
+            <button type="button" data-touch="board">委托</button>
+            <button type="button" data-touch="guide">玩法</button>
+            <button type="button" data-touch="follow">跟随角色</button>
+            <button type="button" data-touch="overview">全景</button>
+            <button type="button" data-touch="zoom-in">放大</button>
+            <button type="button" data-touch="zoom-out">缩小</button>
+            <button type="button" data-touch="find-car">找车</button>
+            <button type="button" data-touch="find-boat">找船</button>
+            <button type="button" data-touch="photo">拍照</button>
+            <button type="button" data-touch="fertilize">施肥</button>
+            <button type="button" data-touch="cancel-ride">取消载客</button>
+            <button type="button" data-touch="finish-cafe">结束服务</button>
+            <button type="button" data-touch="details">人物状态</button>
+            <button type="button" data-touch="creator">更换外观</button>
+            <button type="button" data-touch="intro">入门引导</button>
+            <button type="button" data-touch="back">取消选中</button>
+          </div>
+          <div id="touch-pad" role="img" aria-label="移动和驾驶摇杆"><span id="touch-stick"></span></div>
+          <div class="touch-actions">
+            <button type="button" id="touch-interact" data-touch="interact">互动</button>
+            <button type="button" id="touch-vehicle" data-touch="vehicle">上车／船</button>
+            <button type="button" id="touch-primary" data-touch="primary">按住短跑</button>
+          </div>
+          <output id="touch-hint"></output>
+        </section>
+        <script src="lagoon-0.46.0-b9e086ca2879.touch.js"></script>
+        <script src="lagoon-0.46.0-b9e086ca2879.cloud-saves.js"></script>
+        <output id="performance-readout" aria-label="游戏性能读数" hidden>继续游戏后开始采样。</output>
+        <script>
+        (()=>{
+          const canvas=document.getElementById('canvas');
+          const toggle=document.getElementById('fullscreen-toggle');
+          const feedback=document.getElementById('display-feedback');
+          const update=document.getElementById('update-available');
+          const isToolbar = target => target instanceof Element && !!target.closest('#browser-tools button');
+          let escapeUntil=0;
+          window.addEventListener('blur',()=>LagoonFiles.notify('blur'));
+          document.addEventListener('visibilitychange',()=>{if(document.hidden)LagoonFiles.notify('hidden');});
+          canvas.addEventListener('pointerdown',()=>canvas.focus());
+          canvas.addEventListener('wheel',event=>event.preventDefault(),{passive:false});
+          canvas.addEventListener('contextmenu',event=>event.preventDefault());
+          window.addEventListener('keyup',event=>{if(isToolbar(event.target))event.stopImmediatePropagation();},true);
+          window.addEventListener('keydown',event=>{
+            if(isToolbar(event.target)){event.stopImmediatePropagation();return;}
+            const editing=event.target instanceof Element&&event.target.closest('input,textarea,select,[contenteditable="true"]');
+            if(!editing&&event.key==='Escape'&&(document.fullscreenElement||performance.now()<escapeUntil)){
+              event.stopImmediatePropagation(); return;
+            }
+            if(!editing&&document.activeElement===canvas&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home'].includes(event.code))event.preventDefault();
+          },true);
+          document.getElementById('browser-tools').addEventListener('pointerdown',()=>LagoonFiles.notify('release'));
+          update.addEventListener('click',()=>{
+            LagoonFiles.notify('release');
+            if(LagoonFiles.active)LagoonFiles.notify('open_update');
+            else {LagoonFiles.prepareUpdate();engine.requestQuit();}
+          });
+          toggle.addEventListener('click',async()=>{
+            LagoonFiles.notify('release');
+            try {
+              feedback.textContent='';
+              if(document.fullscreenElement)await document.exitFullscreen();
+              else await document.documentElement.requestFullscreen();
+              canvas.focus();
+            }catch(error){feedback.textContent='当前浏览器未允许全屏，可继续在窗口中游玩。';}
+          });
+          document.addEventListener('fullscreenchange',()=>{
+            const full=!!document.fullscreenElement;
+            toggle.textContent=full?'退出全屏':'全屏';
+            toggle.setAttribute('aria-pressed',String(full));
+            if(!full){escapeUntil=performance.now()+350;LagoonFiles.notify('fullscreen_exit');}
+          });
+          if(!document.fullscreenEnabled){toggle.disabled=true;toggle.textContent='全屏不可用';}
+        })();
+        </script>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+        <section id="status" role="status" aria-live="polite" aria-label="游戏加载进度">
+            <div class="loading-content">
+                <p class="loading-brand">LAGOON LIFE</p>
+                <h1 class="loading-title">海湾生活</h1>
+                <p class="loading-tagline">一座小镇，许多种生活。</p>
+                <div class="loading-detail"><span id="status-caption">正在载入小镇资源</span><output id="status-percent">准备中</output></div>
+                <progress id="status-progress" aria-label="小镇资源下载进度"></progress>
+                <p class="loading-hint" id="status-hint">首次来到海湾，需要一点准备时间。</p>
+                <div id="status-notice" role="alert"></div>
+                <button id="status-retry" hidden onclick="location.reload()">重新加载</button>
+            </div>
+        </section>
+
+		<script src="lagoon-0.46.0-b9e086ca2879.offline.js"></script>
+		<script src="lagoon-0.46.0-b9e086ca2879.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"lagoon-0.46.0-b9e086ca2879","experimentalVK":false,"fileSizes":{"lagoon-0.46.0-b9e086ca2879.pck":8398568,"lagoon-0.46.0-b9e086ca2879.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_THREADS_ENABLED = false;
+const BUILD_VERSION = '0.46.0';
+const engine = new Engine(GODOT_CONFIG);
+// Normal engine exit completes its filesystem flush before asking for new HTML.
+GODOT_CONFIG.onExit = code => {
+ if(window.LagoonFiles.updating&&code===0)location.replace(new URL('index.html?v='+window.LagoonFiles.pendingVersion,location.href));
+};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)window.LagoonFiles.checkUpdate();});
+setInterval(()=>{if(!document.hidden)window.LagoonFiles.checkUpdate();},60000);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+	const statusCaption = document.getElementById('status-caption');
+	const statusPercent = document.getElementById('status-percent');
+
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		statusCaption.textContent = '暂时无法进入海湾';
+		statusPercent.textContent = '';
+		document.getElementById('status-hint').hidden = true;
+		document.getElementById('status-retry').hidden = false;
+		if (err instanceof Error) {
+			setStatusNotice(/failed loading|failed to fetch|network/i.test(err.message)?'小镇资源没有下载完整。请检查网络，稍后点击“重新加载”。':err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	// Keep the crisp HTML cover until the game's first menu frame is drawn.
+	window.LagoonFiles.ready = () => { setStatusMode('hidden'); window.LagoonOffline?.prepare(); };
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onExit': GODOT_CONFIG.onExit,
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+					statusPercent.textContent = Math.min(100, Math.floor(current / total * 100)) + '%';
+				} else {
+					statusPercent.textContent = '准备中';
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			window.LagoonFiles.checkUpdate();
+			if (initializing) {
+				statusCaption.textContent = '正在布置你的小镇';
+				statusPercent.textContent = '即将抵达';
+			}
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
+</html>
+

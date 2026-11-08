@@ -4,10 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover">
 		<title>Lagoon Life · 海湾生活</title>
-        <link rel="manifest" href="lagoon-0.45.1-86f854fe100d.webmanifest">
+        <link rel="manifest" href="lagoon-0.46.0-b9e086ca2879.webmanifest">
         <meta name="theme-color" content="#193e33">
-        <link rel="apple-touch-icon" href="lagoon-0.45.1-86f854fe100d.pwa-192.png">
-        <meta name="game-version" content="0.45.1">
+        <link rel="apple-touch-icon" href="lagoon-0.46.0-b9e086ca2879.pwa-192.png">
+        <meta name="game-version" content="0.46.0">
 		<style>
 :root { color-scheme: dark; font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
 html, body, #canvas { margin:0; padding:0; border:0; }
@@ -21,13 +21,19 @@ body { color:#f8f4e6; background:#193e33; overflow:hidden; }
 #touch-controls button:focus-visible { outline:2px solid #f3d583; }
 .touch-nav { position:absolute; top:var(--top); left:var(--left); right:var(--right); display:flex; justify-content:flex-end; flex-wrap:wrap; gap:6px; }
 #touch-time { margin-right:auto; align-self:center; background:#193e33ee; border-radius:8px; padding:8px; color:#fff9e8; }
-#touch-extra { position:absolute; top:calc(var(--top) + 52px); right:var(--right); display:grid; grid-template-columns:repeat(2, minmax(96px,1fr)); gap:6px; padding:8px; max-height:calc(100% - 120px); overflow:auto; background:#173a2df5; border-radius:14px; pointer-events:auto; touch-action:pan-y; }
+#touch-goal { position:absolute; top:calc(var(--top) + 54px); left:var(--left); display:grid; gap:3px; width:max-content; max-width:min(310px,calc(100% - 24px)); box-sizing:border-box; padding:9px 12px; border-radius:12px; background:#fff4d9f5; color:#214737; box-shadow:0 4px 16px #173a2d32; }
+#touch-goal[hidden] { display:none; }
+#touch-goal-heading { color:#725223; font-size:12px; }
+#touch-goal-title { font-size:17px; line-height:1.3; }
+#touch-goal-detail { font-size:13px; line-height:1.4; white-space:pre-line; }
+#touch-extra { z-index:1; position:absolute; top:calc(var(--top) + 52px); right:var(--right); display:grid; grid-template-columns:repeat(2, minmax(96px,1fr)); gap:6px; padding:8px; max-height:calc(100% - 120px); overflow:auto; background:#173a2df5; border-radius:14px; pointer-events:auto; touch-action:pan-y; }
 #touch-extra[hidden], #touch-controls[hidden] { display:none; }
 #touch-extra button { touch-action:pan-y; }
 #touch-pad { position:absolute; left:var(--left); bottom:var(--bottom); width:116px; height:116px; display:grid; place-items:center; border-radius:50%; border:1px solid #b4d2b5; background:#204c3fca; pointer-events:auto; touch-action:none; user-select:none; }
 #touch-stick { display:block; width:48px; height:48px; border-radius:50%; background:#f4e9c1; border:2px solid #92b096; box-shadow:0 2px 9px #193e3360; pointer-events:none; }
 .touch-actions { position:absolute; right:var(--right); bottom:var(--bottom); display:grid; grid-template-columns:repeat(2,auto); justify-items:stretch; gap:6px; }
-#touch-interact { grid-column:span 2; min-height:48px; background:#eddba4; color:#1a3a2f; }
+#touch-interact { grid-column:span 2; min-height:48px; max-width:224px; }
+#touch-interact.ready { background:#f5df9e; color:#1a3a2f; border-color:#fff1c5; }
 #touch-hint { position:absolute; bottom:calc(var(--bottom) + 125px); left:var(--left); max-width:min(550px,calc(100% - 24px)); padding:5px 10px; border-radius:8px; background:#193e33dc; color:#fff9e8; overflow-wrap:anywhere; }
 #touch-hint:empty { display:none; }
 body.touch-game #browser-tools { display:none; }
@@ -38,7 +44,7 @@ body.touch-game #browser-tools { display:none; }
 }
 @media (max-width:480px) {
   #touch-time { position:absolute; top:50px; left:0; }
-  #touch-extra { top:calc(var(--top) + 86px); }
+  #touch-extra, #touch-goal { top:calc(var(--top) + 90px); }
 }
 
 #browser-tools { position:fixed; right:16px; bottom:12px; z-index:3; display:flex; align-items:center; gap:12px; }
@@ -69,6 +75,8 @@ body.touch-game #browser-tools { display:none; }
 #status-notice { display:none; background:#f5eddf; color:#543e31; border-radius:12px; padding:20px; font-size:14px; line-height:1.7; overflow-wrap:anywhere; text-align:left; }
 #status-retry { margin-top:20px; padding:12px 24px; color:#193e33; background:#dfc58b; border:0; border-radius:10px; font:inherit; cursor:pointer; }
 #status-retry:focus-visible { outline:2px solid #fff8e4; outline-offset:4px; }
+#touch-extra, dialog.lagoon-cloud { scrollbar-width:none; }
+#touch-extra::-webkit-scrollbar, dialog.lagoon-cloud::-webkit-scrollbar { display:none; }
 dialog.lagoon-cloud { max-height:calc(100dvh - 32px); overflow:auto; }
 .lagoon-cloud h2 { margin:0 0 16px; font-size:24px; }
 .lagoon-cloud p { line-height:1.55; white-space:pre-line; overflow-wrap:anywhere; }
@@ -85,8 +93,8 @@ dialog.lagoon-cloud { max-height:calc(100dvh - 32px); overflow:auto; }
 .lagoon-cloud > button { margin-top:16px; }
 @media (prefers-reduced-motion:reduce) { #status-progress { animation:none; } }
 </style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="lagoon-0.45.1-86f854fe100d.icon.png" />
-<link rel="apple-touch-icon" href="lagoon-0.45.1-86f854fe100d.apple-touch-icon.png"/>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="lagoon-0.46.0-b9e086ca2879.icon.png" />
+<link rel="apple-touch-icon" href="lagoon-0.46.0-b9e086ca2879.apple-touch-icon.png"/>
 
 <script>
 window.LagoonFiles = {
@@ -180,6 +188,11 @@ window.LagoonFiles = {
             <button type="button" data-touch="pause">暂停</button>
             <button type="button" data-touch="more" aria-expanded="false" aria-controls="touch-extra">更多</button>
           </nav>
+          <div id="touch-goal" aria-label="当前目标" hidden>
+            <span id="touch-goal-heading"></span>
+            <strong id="touch-goal-title"></strong>
+            <span id="touch-goal-detail"></span>
+          </div>
           <div id="touch-extra" hidden>
             <button type="button" data-touch="bag">背包</button>
             <button type="button" data-touch="calendar">日历</button>
@@ -195,7 +208,9 @@ window.LagoonFiles = {
             <button type="button" data-touch="fertilize">施肥</button>
             <button type="button" data-touch="cancel-ride">取消载客</button>
             <button type="button" data-touch="finish-cafe">结束服务</button>
-            <button type="button" data-touch="details">地点与状态</button>
+            <button type="button" data-touch="details">人物状态</button>
+            <button type="button" data-touch="creator">更换外观</button>
+            <button type="button" data-touch="intro">入门引导</button>
             <button type="button" data-touch="back">取消选中</button>
           </div>
           <div id="touch-pad" role="img" aria-label="移动和驾驶摇杆"><span id="touch-stick"></span></div>
@@ -206,8 +221,8 @@ window.LagoonFiles = {
           </div>
           <output id="touch-hint"></output>
         </section>
-        <script src="lagoon-0.45.1-86f854fe100d.touch.js"></script>
-        <script src="lagoon-0.45.1-86f854fe100d.cloud-saves.js"></script>
+        <script src="lagoon-0.46.0-b9e086ca2879.touch.js"></script>
+        <script src="lagoon-0.46.0-b9e086ca2879.cloud-saves.js"></script>
         <output id="performance-readout" aria-label="游戏性能读数" hidden>继续游戏后开始采样。</output>
         <script>
         (()=>{
@@ -273,12 +288,12 @@ window.LagoonFiles = {
             </div>
         </section>
 
-		<script src="lagoon-0.45.1-86f854fe100d.offline.js"></script>
-		<script src="lagoon-0.45.1-86f854fe100d.js"></script>
+		<script src="lagoon-0.46.0-b9e086ca2879.offline.js"></script>
+		<script src="lagoon-0.46.0-b9e086ca2879.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"lagoon-0.45.1-86f854fe100d","experimentalVK":false,"fileSizes":{"lagoon-0.45.1-86f854fe100d.pck":8397128,"lagoon-0.45.1-86f854fe100d.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"lagoon-0.46.0-b9e086ca2879","experimentalVK":false,"fileSizes":{"lagoon-0.46.0-b9e086ca2879.pck":8398568,"lagoon-0.46.0-b9e086ca2879.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
-const BUILD_VERSION = '0.45.1';
+const BUILD_VERSION = '0.46.0';
 const engine = new Engine(GODOT_CONFIG);
 // Normal engine exit completes its filesystem flush before asking for new HTML.
 GODOT_CONFIG.onExit = code => {
